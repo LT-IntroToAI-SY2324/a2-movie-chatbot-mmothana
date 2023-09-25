@@ -35,18 +35,18 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
         # If you get stuck on this one, we encourage you to attempt the other conditions
         #   and come back to this one afterwards
         elif pattern [pind] == "%":
-            if pind == (len(pattern) - 1):
+            pind += 1
+            if pind == len(pattern):
                 result.append(" ".join(source[sind:]))
                 return result
             else:
-                accum = ""
-                pind += 1
+                current = sind
                 while pattern[pind] != source[sind]:
                     accum += source[sind] + " "
                     sind += 1
-                    if sind >= len(source):
+                    if sind == len(source):
                         return None
-                result.append(accum.strip())
+                result.append(" ".join(source[current:sind]))
         # 3) if we reached the end of the source but not the pattern
         elif sind == len(source) and pind < len(pattern):
             return None
@@ -73,22 +73,31 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
 if __name__ == "__main__":
     print(match(["x", "y", "z"], ["x", "y", "z"]))
     assert match(["x", "y", "z"], ["x", "y", "z"]) == [], "test 1 failed"
-    print(match(["x", "y", "z"], ["x", "y", "z"]))
-    assert match(["x", "z", "z"], ["x", "y", "z"]) == None, "test 2 failed"
+    print(match(["x", "z", "z"], ["x", "y", "z"]))
+    assert match(["x","z", "z"], ["x", "y", "z"]) == None, "test 2 failed"
+    print(match(["x,  y"],["x", "y", "z"]))
     assert match(["x", "y"], ["x", "y", "z"]) == None, "test 3 failed"
+    print(match(["x", "y", "z","z"],["x","y","z"]))
     assert match(["x", "y", "z", "z"], ["x", "y", "z"]) == None, "test 4 failed"
     print(match(["x","_","z"], ["x","y","z"]))
     assert match(["x", "_", "z"], ["x", "y", "z"]) == ["y"], "test 5 failed"
+    print(match(["x","_","_"],["x","y","z"]))
     assert match(["x", "_", "_"], ["x", "y", "z"]) == ["y", "z"], "test 6 failed"
     print(match(["%"], ["x","y","z"]))
     assert match(["%"], ["x", "y", "z"]) == ["x y z"], "test 7 failed"
     print(match(["x","%","z"], ["x", "y", "z"]))
     assert match(["x", "%", "z"], ["x", "y", "z"]) == ["y"], "test 8 failed"
+    print(match(["%","z"],["x","y","z"]))
     assert match(["%", "z"], ["x", "y", "z"]) == ["x y"], "test 9 failed"
+    print(match(["x","%","y"], ["x","y","z"]))
     assert match(["x", "%", "y"], ["x", "y", "z"]) == None, "test 10 failed"
+    print(match(["x","%","y","z"],["x","y","z"]))
     assert match(["x", "%", "y", "z"], ["x", "y", "z"]) == [""], "test 11 failed"
+    print(match(["X","y","z","%"],["x","y","z"]))
     assert match(["x", "y", "z", "%"], ["x", "y", "z"]) == [""], "test 12 failed"
+    print(match(["_","%"],["x","y","z"]))
     assert match(["_", "%"], ["x", "y", "z"]) == ["x", "y z"], "test 13 failed"
+    print(match(["_","_","_","%"],["x","y","z"]))
     assert match(["_", "_", "_", "%"], ["x", "y", "z"]) == [
         "x",
         "y",
@@ -97,6 +106,7 @@ if __name__ == "__main__":
     ], "test 14 failed"
     # this last case is a strange one, but it exposes an issue with the way we've
     # written our match function
+    print(match(["x","%","z"],["x","y","z","z","z"]))
     assert match(["x", "%", "z"], ["x", "y", "z", "z", "z"]) == None, "test 15 failed"
 
     print("All tests passed!")
